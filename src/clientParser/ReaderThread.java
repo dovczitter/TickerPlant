@@ -1,3 +1,8 @@
+/*
+ *   File : ReaderThread.java 
+ * Author : Dov Czitter
+ *   Date : 08jan2013
+ */
 package clientParser;
 
 import java.io.DataInputStream;
@@ -16,58 +21,79 @@ import static common.ConfigType.*;
 
 public class ReaderThread implements Runnable
 {
+	// Common reader worker queue.
+	private final static int MaxMessageSize = 1024;
 	private BlockingQueue<String> queue;
-	private common.Logger logger = new common.Logger (ClientParser.class.getName());
-
-	ReaderThread (BlockingQueue<String> q) { this.queue = q; }
+	private DataInputStream dataInputStream;
+	private DatagramSocket  datagramSocket;
+	private DatagramPacket  datagramPacket;
 	
-	private BlockingQueue<String> getQueue() { return this.queue; }
-	
-	public void run()
+	private BlockingQueue<String> getQueue()     { return this.queue; }
+	private DataInputStream getDataInputStream() { return this.dataInputStream; }
+	private DatagramSocket  getDatagramSocket()  { return this.datagramSocket; }
+	private DatagramPacket  getDatagramPacket()  { return this.datagramPacket; }
+	/*
+	 * ReaderThread();
+	 * 		Initialize connection in the constructor.
+	 */
+	ReaderThread (BlockingQueue<String> q) throws Exception
 	{
+		this.queue = q;
 		switch (getConnectType()) {
-			case TCP: recvTcp (); break;
-			case UDP: recvUdp (); break;
+			case TCP: 
+				dataInputStream = new DataInputStream (getTcpSocket().getInputStream());
+				break;
+			case UDP:
+				datagramSocket = new DatagramSocket (getHostPort());
+				byte[] receiveData = new byte[MaxMessageSize];
+		    	datagramPacket = new DatagramPacket (receiveData, receiveData.length);
+				break;
 			default:
 				break;
 		}
 	}
-	private void recvTcp()
+	public void run()
 	{
+		String msg = null;
 		try {
-			Socket socket = getTcpSocket();
-			DataInputStream dis = new DataInputStream (socket.getInputStream());
-			BlockingQueue<String> q = getQueue();
-		    while (true)
-		    {
-		    	int msgLen = readLength(dis);
-		    	String msg = readFully (dis, msgLen);
-			    StatusType.RecvMsg.incrementIntValue();
-			    q.put(msg);
-		    }
+			while (true) {
+				switch (getConnectType()) {
+					case TCP: msg = recvTcp(); break;
+					case UDP: msg = recvUdp(); break;
+					default: break;
+				}
+				if (msg!=null && !msg.isEmpty()) {
+				    StatusType.RecvMsg.incrementIntValue();
+					getQueue().put(msg);
+				}
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
-	@SuppressWarnings("resource")
-	private void recvUdp()
+	/*
+	 * recvTcp():
+	 * 		Pended streaming tcp data recieve.
+	 * 		Streaming tcp packet receiver, <4 byte data length> + <length data>.
+	 */
+	private String recvTcp() throws IOException
 	{
-		int port = getHostPort();
-		try {
-			byte[] receiveData = new byte[1024];
-			DatagramSocket clientSocket  = new DatagramSocket (port);
-			BlockingQueue<String> q = getQueue();
-		    while (true)
-		    {
-		    	DatagramPacket receivePacket = new DatagramPacket (receiveData, receiveData.length);
-    			clientSocket.receive (receivePacket);
-	    		StatusType.RecvMsg.incrementIntValue();
-			    q.put (new String (receivePacket.getData()));
-		    }
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+    	return readFully (readLength());
 	}
+	/*
+	 * recvUdp():
+	 * 		Udp datagram receiver, one complete message per packet.
+	 */
+	private String recvUdp() throws IOException
+	{
+    	getDatagramSocket().receive (getDatagramPacket());
+   		return (new String (getDatagramPacket().getData()));
+	}
+	/*
+	 * getTcpSocket():
+	 * 		Recieve tcp socket initialization.
+	 * 		Based on initial Client configuration parameters.
+	 */
 	private Socket getTcpSocket () throws Exception
 	{
 		Socket socket = null;
@@ -75,7 +101,7 @@ public class ReaderThread implements Runnable
 		int port = getHostPort();
 		while (socket == null) {
 		    try {
-			    logger.logInfo ("Connecting to host "+server+",  port "+port);
+		    	ClientParser.logger.logInfo ("Connecting to host "+server+",  port "+port);
 			    StatusType.Waiting.incrementIntValue();
 			    
 		    	InetAddress inteAddress = InetAddress.getByName (server);
@@ -85,31 +111,36 @@ public class ReaderThread implements Runnable
 		    } 
 		    catch (SocketTimeoutException ste) {
 				socket = null;
-				logger.logConsole ("Waiting for connection to: " + server);
+				ClientParser.logger.logConsole ("Waiting for connection to: " + server);
 		    }
 		}
 	    return socket;
 	}
-	private int readLength (DataInputStream dis) throws IOException
+	/*
+	 * readLength ():
+	 * 		Read the
+	 */
+	private int readLength () throws IOException
 	{
+		;
 	    int len = 4;
 	    byte[] data = new byte[len];
-	    dis.readFully(data,0,len);
+	    getDataInputStream().readFully(data,0,len);
 	    String s = new String (data);
 	    int rlen = 0;
 	    try {
 	    	rlen = Integer.parseInt (s.replaceAll ("^0*", ""));
 	    }
 	    catch (Exception e) {
-	    	logger.logError (e.getMessage());
+	    	ClientParser.logger.logError (e.getMessage());
 	    	rlen = 0;
 		}
 		return rlen;
 	}
-	private String readFully (DataInputStream dis, int length) throws IOException
+	private String readFully (int length) throws IOException
 	{
 	    byte[] data = new byte[length];
-	    dis.readFully(data,0,length);
+	    getDataInputStream().readFully(data,0,length);
 		return new String (data);
 	}
 }

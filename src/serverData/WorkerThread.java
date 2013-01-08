@@ -1,4 +1,8 @@
-// [server] Worker.java
+/*
+ *   File : WorkerThread.java [Server] 
+ * Author : Dov Czitter
+ *   Date : 08jan2013
+ */
 package serverData;
 
 import static common.ConfigType.getConnectType;
@@ -13,6 +17,7 @@ import java.net.Socket;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 
 import common.ConfigType;
@@ -21,7 +26,6 @@ import common.StatusType;
 public class WorkerThread extends Thread
 {
 	protected Socket clientSocket;
-	private static common.Logger logger = new common.Logger (ServerData.class.getName());
 	
 	WorkerThread () { start(); }
 	WorkerThread (Socket clientSocket) {
@@ -32,21 +36,25 @@ public class WorkerThread extends Thread
 
 	public void run()
 	{
-		logger.logInfo("Worker start...");
+		ServerData.logger.logInfo("Worker start...");
 		switch (getConnectType())
 		{
 			case TCP:
-				sendTcp(getClientSocket());
+				sendTcp (getClientSocket());
 				break;
 			case UDP:
-				sendUdp();
+				sendUdp ();
 				break;
 			default:
 				break;
 		}
-		logger.logInfo("Worker end...");
+		ServerData.logger.logInfo("Worker end...");
 		System.exit(0);
 	}
+	/*
+	 * sendTcp ():
+	 * 		Send streaming tcp data to a well known client socket.
+	 */
 	private void sendTcp (Socket clientSocket)
 	{
 		try { 
@@ -55,20 +63,27 @@ public class WorkerThread extends Thread
 			{
 				while (!ServerData.sendFlag)
 					Thread.sleep(1);
-				sendTcpData (dos);
+				for (String d : getPackedData()) {
+					dos.write(d.getBytes(),0,d.length());
+				}
 			}
 			clientSocket.close(); 
 		} 
 		catch (Exception e) { 
-			logger.logError ("Problem with Communication Server: "+e.getMessage());
+			ServerData.logger.logError ("Problem with Communication Server: "+e.getMessage());
 		}
 	}
+	/*
+	 * sendUdp ():
+	 * 		Send sample file test data as udp DatagramPackets.
+	 */
 	private void sendUdp ()
 	{
 		try {
 			int serverPort = 9999;
 			int datagramPort = ConfigType.getHostPort();;
 			
+			@SuppressWarnings("resource")
 			DatagramSocket socket = new DatagramSocket(serverPort);
 			socket.setBroadcast (true);
 			InetAddress ipAddress = InetAddress.getLocalHost();
@@ -83,35 +98,41 @@ public class WorkerThread extends Thread
 	        }
        	}
 		catch (Exception e) { 
-			logger.logError ("Problem with Communication Server: "+e.getMessage());
+			ServerData.logger.logError ("Problem with Communication Server: "+e.getMessage());
 		}
 	}
-	private void sendTcpData (DataOutputStream dos)
+	/*
+	 *  getPackedData ():
+	 * 		Tcp data packet format : <4 byte message length>+<message> 
+	 * 		Pack each data packet into 4k blocks for efficient transport.
+	 */
+	private List<String> getPackedData () throws IOException
 	{
+		List<String> data = new ArrayList<String>();
 		try { 
-			logger.logInfo ("Server: About to send data...");
 			StringBuffer sb = new StringBuffer();
 			for (String d : getFileData ()) {
 				String s = String.format("%04d%s",d.length(),d);
 				sb.append(s);
 				StatusType.SendMsg.incrementIntValue();
-				/****
-				 * 	This pre-buffering increased throughput
-				 *  from 55k to 70k mps.
-				 */
 				if (sb.length() > 4096) { 
-					s = sb.toString();
-					dos.write(s.getBytes(),0,s.length());
+					data.add(sb.toString());
 					sb.setLength(0);
 				}
 			}
-			logger.logInfo ("Server: ...Complete."); 
+			if (sb.length() > 0)  
+				data.add(sb.toString());
 		} 
 		catch (Exception e) { 
-			logger.logError ("Problem with Communication Server : "+e.getMessage());
+			ServerData.logger.logError ("Problem with Communication Server : "+e.getMessage());
 			System.exit(1); 
 		} 
+		return data;
 	}
+	/*
+	 *  getFileData ():
+	 * 		Retrieve sample file test data for tcp or udp send.
+	 */
 	private List<String> getFileData () throws IOException
 	{
 		String fileName = ConfigType.dataFilename.getValue();

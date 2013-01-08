@@ -1,7 +1,17 @@
+/*
+ *   File : CtsMessage.java 
+ * Author : Dov Czitter
+ *   Date : 08jan2013
+ */
 package clientParser;
 
 public class CtsMessage
 {
+	/*
+	 * The constructor will initialize the component field
+	 * start and end positions of the raw data message.
+	 * This enables efficient field extraction. 
+	 */
 	public CtsMessage ()
 	{
 		totalHeaderSize = 0;

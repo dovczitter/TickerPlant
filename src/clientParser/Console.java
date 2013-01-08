@@ -1,4 +1,8 @@
-// = [client] Console.java =
+/*
+ *   File : Console.java [Client] 
+ * Author : Dov Czitter
+ *   Date : 08jan2013
+ */
 package clientParser;
 
 import java.io.*;
@@ -10,7 +14,6 @@ import common.ConfigType.ServerType;
 public class Console extends Thread
 {
 	private static BlockingQueue<String> sharedQueue = null;
-	private common.Logger logger = new common.Logger (ClientParser.class.getName());
 	
 	Console ()
 	{
@@ -18,6 +21,7 @@ public class Console extends Thread
 	}
 	Console (BlockingQueue<String> sharedQ)
 	{
+		// We need the queue for performance statics.
 		sharedQueue = sharedQ;
 		startConsole ();
 	}
@@ -34,7 +38,7 @@ public class Console extends Thread
 	}
 	public void run()
 	{
-		logger.logInfo("Console start...");
+		ClientParser.logger.logInfo("Console start...");
 		String banner = ConfigType.getBanner();
 		try {
 			BufferedReader stdIn = new BufferedReader (new InputStreamReader(System.in));
@@ -70,7 +74,7 @@ public class Console extends Thread
 			System.out.println (banner+" : ERROR - "+e.getMessage()); 
 			e.printStackTrace();
 		}
-		logger.logInfo("Console end...");
+		ClientParser.logger.logInfo("Console end...");
 		System.exit(0);
 	}
 }

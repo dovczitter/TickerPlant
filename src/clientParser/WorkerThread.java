@@ -1,4 +1,8 @@
-// = [client] Worker.java =
+/*
+ *   File : WorkerThread.java  [Client] 
+ * Author : Dov Czitter
+ *   Date : 08jan2013
+ */
 package clientParser;
 
 import java.util.concurrent.BlockingQueue;
@@ -7,20 +11,20 @@ import common.ConfigType.SourceType;
  
 public class WorkerThread implements Runnable
 {
-	private final BlockingQueue<String> sharedQueue;
+	// Common reader worker queue.
+	private final BlockingQueue<String> queue;
 	private SourceType sourceType;
-	private static common.Logger logger = new common.Logger (ClientParser.class.getName());
-
-	WorkerThread (BlockingQueue<String> sharedQueue)
+	WorkerThread (BlockingQueue<String> queue)
 	{
 		this.sourceType = ConfigType.getSourceType();
-		this.sharedQueue = sharedQueue;
+		this.queue = queue;
 	}
-	public SourceType getSourceType() { return this.sourceType; }
+	private SourceType getSourceType() { return this.sourceType; }
+	private BlockingQueue<String> getQueue() { return this.queue; }
 	
 	public void run()
 	{
-		logger.logInfo("Worker start...");
+		ClientParser.logger.logInfo("Worker start...");
 		StatusType.setStartMS();
 		CtsMessage ctsMessage = new CtsMessage();
 		CqsMessage cqsMessage = new CqsMessage();
@@ -28,24 +32,31 @@ public class WorkerThread implements Runnable
 		
 	    try {
 	        while(true) {
-	        	String msg = (String)this.sharedQueue.take();
+	        	// Pend of a queue element.
+	        	String msg = (String)getQueue().take();
+	        	// Update status info for console display.
 	        	switch (sourceType) {
 			    	case Cts:
-			    		processCtsTestSymbol (ctsMessage, msg);
+			    		processCtsInfo (ctsMessage, msg);
 			    		break;
 			    	case Cqs:
-			    		processCqsTestSymbol (cqsMessage, msg);
+			    		processCqsInfo (cqsMessage, msg);
 			    		break;
 			    	default:
 			    		break;
 			    }
 	        }
 	    } catch (InterruptedException ex) {
-	    	logger.logError(ex.getMessage());
+	    	ClientParser.logger.logError(ex.getMessage());
 	    }			
-		logger.logInfo("Worker end...");
+	    ClientParser.logger.logInfo("Worker end...");
 	}
-	private void processCtsTestSymbol (CtsMessage ctsMessage, String msg)
+	/*
+	 * processCtsInfo():
+	 * 		This is where the Cts business logic is applied.
+	 * 		We update a ststus field with symbol, time, price info for console display.
+	 */
+	private void processCtsInfo (CtsMessage ctsMessage, String msg)
 	{
 		final String testSymbol = common.ConfigType.testSymbol.getValue();
 		String msgSymbol = ctsMessage.getMsgSymbol (msg);
@@ -58,7 +69,12 @@ public class WorkerThread implements Runnable
 			}
 		}
 	}
-	private void processCqsTestSymbol (CqsMessage cqsMessage, String msg)
+	/*
+	 * processCqsInfo():
+	 * 		This is where the Cqs business logic is applied.
+	 * 		We update a ststus field with symbol, time, quote info for console display.
+	 */
+	private void processCqsInfo (CqsMessage cqsMessage, String msg)
 	{
 		final String testSymbol = common.ConfigType.testSymbol.getValue();
 		String msgSymbol = cqsMessage.getMsgSymbol (msg);

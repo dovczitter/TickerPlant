@@ -1,4 +1,8 @@
-// = [server] Console.java =
+/*
+ *   File : Console.java [Server] 
+ * Author : Dov Czitter
+ *   Date : 08jan2013
+ */
 package serverData;
 
 import java.io.*;
@@ -7,8 +11,10 @@ import common.ConfigType.ServerType;
 
 public class Console extends Thread
 {
-	private static common.Logger logger = new common.Logger (ServerData.class.getName());
-
+	/*
+	 * Console():
+	 * 		Initiallize the console as a Server.
+	 */
 	Console ()
 	{
 		ConfigType.setServerType (ServerType.ServerData);
@@ -16,12 +22,13 @@ public class Console extends Thread
 	}
 	public void run()
 	{
-		logger.logInfo("Console start...");
+		ServerData.logger.logInfo("Console start...");
 		try { 
 			BufferedReader stdIn = new BufferedReader (new InputStreamReader (System.in));
 			String userInput;
 			String banner = ConfigType.getBanner();
 			System.out.print (banner);
+			// Pend for console user input.
 			while ((userInput = stdIn.readLine()) != null)
 			{ 
 				boolean isDown = false;
@@ -30,6 +37,8 @@ public class Console extends Thread
 						System.out.print (ConsoleCmd.getCmds());
 						break;
 					case Ticker:
+						// Toggle the global 'sendFlag' to alert the WorkerThread
+						// to process data.
 						ServerData.sendFlag = ServerData.sendFlag ? false:true;
 						if (ServerData.sendFlag)
 							StatusType.resetAll();
@@ -52,11 +61,11 @@ public class Console extends Thread
 					break;
 	        } 
 			stdIn.close();
-			logger.logInfo("Console end...");
+			ServerData.logger.logInfo("Console end...");
 			System.exit(0);
 		} 
 		catch (IOException e) { 
-			logger.logError("Problem with Communication Server");
+			ServerData.logger.logError("Problem with Communication Server");
 			System.exit(1);
 		}
 	}

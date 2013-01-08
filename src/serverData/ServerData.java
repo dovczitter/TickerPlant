@@ -1,4 +1,14 @@
-// = Server.java =
+/*
+ *   File : ServerData.java 
+ * Author : Dov Czitter
+ *   Date : 08jan2013
+ *   
+ *   This Server will provide market data to a tcp or udp configured connection.
+ *   The data is read from file and can easily be modified to read from a live
+ *   market data connection.
+ *   Tcp is sent as a standard streaming ASCII data packet with a 4 byte length header,
+ *   Udp is broadcast as a per message Datagram.
+ */
 package serverData;
 
 import java.io.IOException;
@@ -11,20 +21,29 @@ import common.StatusType;
 
 public class ServerData extends Thread
 { 
-	protected static boolean serverContinue = true;
-	protected static boolean sendFlag = false;
-	private   static common.Logger logger =  new common.Logger (ServerData.class.getName());
-
+	protected static boolean serverContinue;
+	protected static boolean sendFlag;
+	public static common.Logger logger;
+	/*
+	 * main():
+	 * 		Server mainline for data processing based on configuration file parameters.
+	 */
 	public static void main (String[] args) throws IOException 
 	{ 
-		logger.logInfo("Server start...");
+		// logger.
+		logger =  new common.Logger (ServerData.class.getName());
+		// internal flags.
+		serverContinue = true;
+		sendFlag = false;
+		// internal configuration.
 		loadConfigFile("Server.cfg");
+		// Start up the console.
 		new Console();
-
-		try { 
+		logger.logInfo("Server start...");
+		try {
 			switch (getConnectType()) {
-				case TCP: processTcpRecv(); break;
-				case UDP: processUdpRecv(); break;
+				case TCP: processTcp(); break;
+				case UDP: processUdp(); break;
 				default:
 					break;
 			}
@@ -35,7 +54,13 @@ public class ServerData extends Thread
 		} 
 		logger.logInfo("Server end...");
 	}
-	private static void processTcpRecv ()
+	/*
+	 * processTcp ():
+	 * 		- Post an accept().
+	 *      - Wait for a new connection.
+	 *      - Start a WorkerThread to send tcp data on that socket.
+	 */
+	private static void processTcp ()
 	{
 		int port = getHostPort();
 		ServerSocket serverSocket = null;
@@ -77,7 +102,11 @@ public class ServerData extends Thread
 			} 
 		}
 	}
-	private static void processUdpRecv ()
+	/*
+	 * processUdp ():
+	 *      Start a WorkerThread to broadcast udp data on a well known port.
+	 */
+	private static void processUdp ()
 	{
 		new WorkerThread ();
 	}
