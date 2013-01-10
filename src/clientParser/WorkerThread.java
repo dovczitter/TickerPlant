@@ -5,8 +5,12 @@
  */
 package clientParser;
 
+import java.util.HashMap;
 import java.util.concurrent.BlockingQueue;
-import common.*;
+
+import common.SequenceNumber;
+import common.StatusType;
+import common.ConfigType;
 import common.ConfigType.SourceType;
  
 public class WorkerThread implements Runnable
@@ -19,32 +23,29 @@ public class WorkerThread implements Runnable
 		this.sourceType = ConfigType.getSourceType();
 		this.queue = queue;
 	}
-	private SourceType getSourceType() { return this.sourceType; }
+	private SourceType getSourceType()       { return this.sourceType; }
 	private BlockingQueue<String> getQueue() { return this.queue; }
 	
 	public void run()
 	{
 		ClientParser.logger.logInfo("Worker start...");
 		StatusType.setStartMS();
-		CtsMessage ctsMessage = new CtsMessage();
-		CqsMessage cqsMessage = new CqsMessage();
 		SourceType sourceType = getSourceType();
-		
+		String msg = "";
+		HashMap<String,Element> map = null;
 	    try {
 	        while(true) {
 	        	// Pend of a queue element.
-	        	String msg = (String)getQueue().take();
-	        	// Update status info for console display.
-	        	switch (sourceType) {
-			    	case Cts:
-			    		processCtsInfo (ctsMessage, msg);
-			    		break;
-			    	case Cqs:
-			    		processCqsInfo (cqsMessage, msg);
-			    		break;
-			    	default:
-			    		break;
-			    }
+	        	msg = (String)getQueue().take();
+	        	// Retrieve the appros map.
+	        	map = ParserUtil.getMap (sourceType, msg);
+				if (map != null) {
+					// 'null' map means an unprocessed msg, ie Control.
+					// Update status info for console display.
+					long seqnum = ParserUtil.getMsgSeqnum(map, msg);
+					SequenceNumber.setStats (seqnum);
+					processMsg (map, msg);
+				}
 	        }
 	    } catch (InterruptedException ex) {
 	    	ClientParser.logger.logError(ex.getMessage());
@@ -52,38 +53,24 @@ public class WorkerThread implements Runnable
 	    ClientParser.logger.logInfo("Worker end...");
 	}
 	/*
-	 * processCtsInfo():
+	 * processMsg():
 	 * 		This is where the Cts business logic is applied.
 	 * 		We update a ststus field with symbol, time, price info for console display.
 	 */
-	private void processCtsInfo (CtsMessage ctsMessage, String msg)
+	private void processMsg (HashMap<String,Element> map, String msg)
 	{
 		final String testSymbol = common.ConfigType.testSymbol.getValue();
-		String msgSymbol = ctsMessage.getMsgSymbol (msg);
+		String msgSymbol = ParserUtil.getMsgSymbol (map,msg);
 		if (testSymbol != null && !testSymbol.isEmpty())
 		{
-			if (msgSymbol.contentEquals(testSymbol)) {
-				StatusType.Symbol.setStringValue (String.format("symbol=%s, time=%s, price=%s",
-								msgSymbol, ctsMessage.getMsgTime (msg), ctsMessage.getMsgPrice (msg)));
-				StatusType.Symbol.incrementIntValue();
-			}
-		}
-	}
-	/*
-	 * processCqsInfo():
-	 * 		This is where the Cqs business logic is applied.
-	 * 		We update a ststus field with symbol, time, quote info for console display.
-	 */
-	private void processCqsInfo (CqsMessage cqsMessage, String msg)
-	{
-		final String testSymbol = common.ConfigType.testSymbol.getValue();
-		String msgSymbol = cqsMessage.getMsgSymbol (msg);
-		if (testSymbol != null && !testSymbol.isEmpty())
-		{
-			if (msgSymbol.contentEquals(testSymbol)) {
-				StatusType.Symbol.setStringValue (
-						String.format("symbol=%s, time=%s, quote=%s",
-								msgSymbol, cqsMessage.getMsgTime (msg), cqsMessage.getMsgQuote (msg)));
+			if (msgSymbol.contentEquals(testSymbol))
+			{
+				String msgTime  = ParserUtil.getMsgTime(map, msg);
+				String msgPrice = ParserUtil.getMsgPrice(map, msg);
+				String msgQuote = ParserUtil.getMsgQuote(map, msg);
+				StatusType.Symbol.setStringValue 
+				(String.format("symbol=%s, time=%s, price=%s, %s",
+								msgSymbol, msgTime, msgPrice, msgQuote));
 				StatusType.Symbol.incrementIntValue();
 			}
 		}

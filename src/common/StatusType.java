@@ -12,7 +12,8 @@ public enum StatusType {
 	NewCnct	("", 0),
 	Waiting	("", 0),
 	Timeout	("", 0),
-	Symbol  ("", 0);
+	Symbol  ("", 0),
+	Seqnum  ("", 0);
 	
 	private String sValue = "";
 	private long   lValue = 0;

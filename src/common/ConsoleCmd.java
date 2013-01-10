@@ -50,14 +50,16 @@ public enum ConsoleCmd
 		StatusType.setMPS (StatusType.RecvMsg, StatusType.RecvMPS);
 		StatusType.setMPS (StatusType.SendMsg, StatusType.SendMPS);
 		StatusType.QueSize.setLongValue(Console.getSharedQueueSize());
+		StatusType.Seqnum.setStringValue(SequenceNumber.getStats());
 	}
 	public static String getStats()
 	{
 		updateStats();
 		StringBuilder sb = new StringBuilder();
+		boolean isServer = (ConfigType.getServerType() == ConfigType.ServerType.ServerData); 
 		
 		for (StatusType stat : StatusType.values()) {	
-			if (stat == StatusType.StartMS)
+			if (stat == StatusType.StartMS || (isServer && stat==StatusType.Seqnum))
 				continue;
 			String sValue = stat.getStringValue();
 			sb.append (String.format("[%s %d] ", (sValue.isEmpty() ? stat.name():sValue), stat.getLongValue()));

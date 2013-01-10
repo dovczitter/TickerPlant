@@ -13,7 +13,6 @@ public class ClientParser implements Runnable
 {
 	public static common.Logger logger = new common.Logger (ClientParser.class.getName());
 	private final static int MaxQueueSize = 100000;
-	
 	/*
 	 * main():
 	 * 		Client mainline for data processing based on configuration file parameters.
