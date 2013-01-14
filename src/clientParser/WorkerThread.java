@@ -32,7 +32,7 @@ public class WorkerThread implements Runnable
 		StatusType.setStartMS();
 		SourceType sourceType = getSourceType();
 		String msg = "";
-		HashMap<String,Element> map = null;
+		HashMap<String,MsgIndex> map = null;
 	    try {
 	        while(true) {
 	        	// Pend of a queue element.
@@ -57,7 +57,7 @@ public class WorkerThread implements Runnable
 	 * 		This is where the Cts business logic is applied.
 	 * 		We update a ststus field with symbol, time, price info for console display.
 	 */
-	private void processMsg (HashMap<String,Element> map, String msg)
+	private void processMsg (HashMap<String,MsgIndex> map, String msg)
 	{
 		final String testSymbol = common.ConfigType.testSymbol.getValue();
 		String msgSymbol = ParserUtil.getMsgSymbol (map,msg);

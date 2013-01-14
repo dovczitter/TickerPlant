@@ -5,10 +5,10 @@
  */
 package clientParser;
 
-public class Element {
+public class MsgIndex {
 	private int startIndex;
 	private int endIndex;
-	Element (int startIndex, int endIndex) {
+	MsgIndex (int startIndex, int endIndex) {
 		this.startIndex = startIndex;
 		this.endIndex = endIndex;
 	}
