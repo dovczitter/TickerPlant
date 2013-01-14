@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<!-- CqsHeader.xml -->
+<header>
+	<field>
+		<name>category</name>
+		<size>1</size>
+	</field>
+	<field>
+		<name>type</name>
+		<size>1</size>
+	</field>
+	<field>
+		<name>network</name>
+		<size>1</size>
+	</field>
+	<field>
+		<name>retransReq</name>
+		<size>2</size>
+	</field>
+	<field>
+		<name>identifier</name>
+		<size>1</size>
+	</field>
+	<field>
+		<name>reserved</name>
+		<size>2</size>
+	</field>
+	<field>
+		<name>seqnum</name>
+		<size>9</size>
+	</field>
+	<field>
+		<name>participant</name>
+		<size>1</size>
+	</field>
+	<field>
+		<name>timestamp</name>
+		<size>6</size>
+	</field>
+</header>

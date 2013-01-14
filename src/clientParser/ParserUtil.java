@@ -22,48 +22,29 @@ public class ParserUtil
 {
 	private static int ctsHeaderSize = 0;
 	private static int cqsHeaderSize = 0;
-	private static HashMap<String,MsgIndex> ctsShortTradeMap = null;
-	private static HashMap<String,MsgIndex> ctsLongTradeMap = null;
-	private static HashMap<String,MsgIndex> cqsShortQuoteMap = null;
-	private static HashMap<String,MsgIndex> cqsLongQuoteMap = null;
+	private static HashMap <String, HashMap<String,MsgIndex>> parserMaps = new HashMap<String, HashMap<String,MsgIndex>>();
+	
 	private final static int MsgOffset_type = 1;
-	private final static String xmlRoot = "C:/workspace/TickerPlant/xml/";
+	private final static String xmlRoot = System.getProperty("user.dir") +File.separator+ "xml" +File.separator;
 
 	/*********************************************************/
 	/********      Interal Hashmap Initiallization      ******/
 	/*********************************************************/
 
-	public static HashMap<String,MsgIndex> getMsgtypeMap (MsgType msgType)
+	public static HashMap<String,MsgIndex> getParserMap (MsgType msgType)
 	{
-		HashMap<String,MsgIndex> map = null;
-		switch (msgType)
-		{
-			case CtsShortTrade:     map = ctsShortTradeMap; break; 
-			case CtsEnchShortTrade: map = ctsShortTradeMap; break;
-			case CtsLongTrade:      map = ctsLongTradeMap; 	break;
-			case CqsShortQuote:     map = cqsShortQuoteMap; break;
-			case CqsLongQuote:      map = cqsLongQuoteMap; 	break;
-			default: break;
-		}
-		return map;
+		return parserMaps.get (msgType.name());
 	}
-	public static void setMsgtypeMap (MsgType msgType, HashMap<String,MsgIndex>  map)
+	public static void setParserMap (MsgType msgType, HashMap<String,MsgIndex>  map)
 	{
-		switch (msgType)
-		{
-			case CtsShortTrade:     ctsShortTradeMap = map; break; 
-			case CtsEnchShortTrade: ctsShortTradeMap = map; break;
-			case CtsLongTrade:      ctsLongTradeMap  = map; break;
-			case CqsShortQuote:     cqsShortQuoteMap = map; break;
-			case CqsLongQuote:      cqsLongQuoteMap  = map; break;
-			default: break;
-		}
+		if (getParserMap (msgType) == null)
+			parserMaps.put (msgType.name(), map);
 	}
 	public static HashMap<String,MsgIndex> getMap (SourceType sourceType, String msg)
 	{
 		HashMap<String,MsgIndex> map = null;
 		MsgType msgType = getMsgType (sourceType, msg);
-		map = getMsgtypeMap (msgType);
+		map = getParserMap (msgType);
 		if (map == null && msgType != MsgType.None)
 		{
 			map = getHeaderMap (sourceType);
@@ -85,7 +66,7 @@ public class ParserUtil
 			   }
 			}
 		}
-		setMsgtypeMap (msgType, map);
+		setParserMap (msgType, map);
 		return map;
 	}
 	public static int getHeaderSize (SourceType sourceType)
@@ -114,7 +95,7 @@ public class ParserUtil
 	}
 	private static String getHeaderXmlName (SourceType sourceType)
 	{
-		return (xmlRoot +sourceType.name()+"Header.xml");
+		return (xmlRoot +sourceType.name()+ "Header.xml");
 	}
 	private static NodeList getNodeList (String xmlName)
 	{
