@@ -7,6 +7,7 @@ package clientParser;
 
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
+
 import static common.ConfigType.*;
 
 public class ClientParser implements Runnable
@@ -36,3 +37,4 @@ public class ClientParser implements Runnable
 	}
 	public void run() { }
 }
+	
