@@ -20,8 +20,6 @@ import common.ConfigType.SourceType;
 
 public class ParserUtil
 {
-	private static int ctsHeaderSize = 0;
-	private static int cqsHeaderSize = 0;
 	private static HashMap <String, HashMap<String,MsgIndex>> parserMaps = new HashMap<String, HashMap<String,MsgIndex>>();
 	
 	private final static int MsgOffset_type = 1;
@@ -47,65 +45,44 @@ public class ParserUtil
 		map = getParserMap (msgType);
 		if (map == null && msgType != MsgType.None)
 		{
-			map = getHeaderMap (sourceType);
-			NodeList nodes = getNodeList (getXmlName (sourceType, msg));
-	
+			map = new HashMap<String,MsgIndex>();
+			NodeList nodes = getNodeList (getXmlFilename (sourceType));
+
 			int startIndex,endIndex;
-			int totalSize = getHeaderSize (sourceType);
+			int totalSize = 0;
 			for (int i=0; i < nodes.getLength(); i++)
 			{
 				Node node = (Node) nodes.item(i);
-				if (node.getNodeType() == Node.ELEMENT_NODE)
+				String parentName = node.getParentNode().getNodeName();
+				if (parentName.toLowerCase().contains("header") || parentName.compareToIgnoreCase(msgType.name())==0)
 				{
-	 			   Element e = (Element) node;
-				   int size  = Integer.parseInt(ParserUtil.getTagValue("size", e));
-				   startIndex = totalSize;
-				   endIndex   = totalSize + size;
-				   totalSize  = endIndex;
-				   map.put (ParserUtil.getTagValue("name", e), new MsgIndex (startIndex, endIndex));
-			   }
+					if (node.getNodeType() == Node.ELEMENT_NODE)
+					{
+		 			   Element e = (Element) node;
+					   int size  = Integer.parseInt(ParserUtil.getTagValue("size", e));
+					   startIndex = totalSize;
+					   endIndex   = totalSize + size;
+					   totalSize  = endIndex;
+					   map.put (ParserUtil.getTagValue("name", e), new MsgIndex (startIndex, endIndex));
+					}
+				}
 			}
+			setParserMap (msgType, map);
 		}
-		setParserMap (msgType, map);
 		return map;
 	}
-	public static int getHeaderSize (SourceType sourceType)
+	private static String getXmlFilename (SourceType sourceType)
 	{
-		int headerSize = 0;
-		switch (sourceType)
-		{
-			case Cts: headerSize=ctsHeaderSize; break;
-			case Cqs: headerSize=cqsHeaderSize; break;
-			default: break;
-		}
-		return headerSize;
-	}
-	public static void setHeaderSize (SourceType sourceType, int headerSize)
-	{
-		switch (sourceType)
-		{
-			case Cts: ctsHeaderSize=headerSize; break;
-			case Cqs: cqsHeaderSize=headerSize; break;
-			default: break;
-		}
-	}
-	private static String getXmlName (SourceType sourceType, String msg)
-	{
-		return (xmlRoot +getMsgType (sourceType,msg)+ ".xml");
-	}
-	private static String getHeaderXmlName (SourceType sourceType)
-	{
-		return (xmlRoot +sourceType.name()+ "Header.xml");
+		return (xmlRoot +sourceType.name()+ ".xml");
 	}
 	private static NodeList getNodeList (String xmlName)
 	{
 		NodeList nodeList = null;
 		try {
-			File fXmlFile = new File(xmlName);
 			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder dBuilder;
 			dBuilder = dbFactory.newDocumentBuilder();
-			Document doc = dBuilder.parse(fXmlFile);
+			Document doc = dBuilder.parse (new File(xmlName));
 			doc.getDocumentElement().normalize();
 			nodeList = doc.getElementsByTagName("field");
 		} catch (Exception e) {
@@ -113,29 +90,6 @@ public class ParserUtil
 			System.exit(1);
 		}
 		return nodeList;
-	}
-	private static HashMap<String,MsgIndex> getHeaderMap (SourceType sourceType)
-	{
-		HashMap<String,MsgIndex> map = new HashMap<String,MsgIndex>();
-		NodeList nodes = getNodeList (getHeaderXmlName(sourceType));
-
-		int startIndex,endIndex;
-		int headerSize = 0;
-		for (int i=0; i < nodes.getLength(); i++)
-		{
-			Node node = (Node) nodes.item(i);
-			if (node.getNodeType() == Node.ELEMENT_NODE)
-			{
- 			   Element e = (Element) node;
-			   int size  = Integer.parseInt(ParserUtil.getTagValue("size", e));
-			   startIndex = headerSize;
-			   endIndex   = headerSize + size;
-			   headerSize  = endIndex;
-			   map.put (ParserUtil.getTagValue("name", e), new MsgIndex (startIndex, endIndex));
-		   }
-		}
-		setHeaderSize (sourceType, headerSize);
-		return map;
 	}
 	/*********************************************************/
 	/********         Parsing of incoming message       ******/

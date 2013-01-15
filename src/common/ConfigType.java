@@ -29,8 +29,8 @@ public enum ConfigType
 	}
 	public enum SourceType {
 		None,
-		Cts,
-		Cqs;
+		NyseCts,
+		NyseCqs;
 	}
 	public enum ServerType {
 		None,
@@ -70,10 +70,10 @@ public enum ConfigType
 	}
 	public static SourceType getSourceType ()
 	{
-		if (sourceType.getValue().equalsIgnoreCase(SourceType.Cts.name()))
-			return SourceType.Cts; 
-		else if (sourceType.getValue().equalsIgnoreCase(SourceType.Cqs.name()))
-			return SourceType.Cqs; 
+		for (SourceType st : SourceType.values()) {
+			if (sourceType.getValue().equalsIgnoreCase(st.name()))
+				return st;
+		}
 		return SourceType.None; 
 	}
 	public static ConnectType getConnectType ()

@@ -1,13 +1,13 @@
 package clientParser;
 
 public enum MsgType {
-	None				(' '),
-	CtsShortTrade		('A'),
-	CtsLongTrade		('B'),
-	CtsEnchShortTrade	('I'),
-	CtsLineIntegrity	('T'),
-	CqsShortQuote		('D'),
-	CqsLongQuote		('B');
+	None					(' '),
+	NyseCtsShortTrade		('A'),
+	NyseCtsLongTrade		('B'),
+	NyseCtsEnchShortTrade	('I'),
+	NyseCtsLineIntegrity	('T'),
+	NyseCqsShortQuote		('D'),
+	NyseCqsLongQuote		('B');
 
 	private char value = ' ';
 	MsgType (char value) { this.value = value; }
