@@ -11,8 +11,10 @@ import java.util.HashMap;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -46,24 +48,28 @@ public class ParserUtil
 		if (map == null && msgType != MsgType.None)
 		{
 			map = new HashMap<String,MsgIndex>();
-			NodeList nodes = getNodeList (getXmlFilename (sourceType));
-
+			NodeList nodeList = getNodeList (getXmlFilename (sourceType));
 			int startIndex,endIndex;
 			int totalSize = 0;
-			for (int i=0; i < nodes.getLength(); i++)
+			for (int i=0; i < nodeList.getLength(); i++)
 			{
-				Node node = (Node) nodes.item(i);
+				Node node = (Node) nodeList.item(i);
 				String parentName = node.getParentNode().getNodeName();
 				if (parentName.toLowerCase().contains("header") || parentName.compareToIgnoreCase(msgType.name())==0)
 				{
-					if (node.getNodeType() == Node.ELEMENT_NODE)
+					if (nodeList.item(i).hasAttributes())
 					{
-		 			   Element e = (Element) node;
-					   int size  = Integer.parseInt(ParserUtil.getTagValue("size", e));
-					   startIndex = totalSize;
-					   endIndex   = totalSize + size;
-					   totalSize  = endIndex;
-					   map.put (ParserUtil.getTagValue("name", e), new MsgIndex (startIndex, endIndex));
+						NamedNodeMap attrs = node.getAttributes();
+				        //System.out.print(node.getNodeName());
+				        for (int j = 0; j < attrs.getLength(); j++)
+			        	{
+				        	Attr attribute = (Attr) attrs.item(j);
+				        	int size  = Integer.parseInt(attribute.getValue());
+				        	startIndex = totalSize;
+				        	endIndex   = totalSize + size;
+				        	totalSize  = endIndex;
+				        	map.put (attribute.getName(), new MsgIndex (startIndex, endIndex));
+			        	}
 					}
 				}
 			}
@@ -80,8 +86,7 @@ public class ParserUtil
 		NodeList nodeList = null;
 		try {
 			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-			DocumentBuilder dBuilder;
-			dBuilder = dbFactory.newDocumentBuilder();
+			DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
 			Document doc = dBuilder.parse (new File(xmlName));
 			doc.getDocumentElement().normalize();
 			nodeList = doc.getElementsByTagName("field");

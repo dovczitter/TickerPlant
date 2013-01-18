@@ -2,193 +2,55 @@
 <!-- NyseCqs.xml -->
 <nyseCqs>
 	<nyseHeader>
-		<field>
-			<name>category</name>
-			<size>1</size>
-		</field>
-		<field>
-			<name>type</name>
-			<size>1</size>
-		</field>
-		<field>
-			<name>network</name>
-			<size>1</size>
-		</field>
-		<field>
-			<name>retransReq</name>
-			<size>2</size>
-		</field>
-		<field>
-			<name>identifier</name>
-			<size>1</size>
-		</field>
-		<field>
-			<name>reserved</name>
-			<size>2</size>
-		</field>
-		<field>
-			<name>seqnum</name>
-			<size>9</size>
-		</field>
-		<field>
-			<name>participant</name>
-			<size>1</size>
-		</field>
-		<field>
-			<name>timestamp</name>
-			<size>6</size>
-		</field>
+		<field category="1"/>
+		<field type="1"/>
+		<field network="1"/>
+		<field retransReq="2"/>
+		<field identifier="1"/>
+		<field reserved="2"/>
+		<field seqnum="9"/>
+		<field participant="1"/>
+		<field timestamp="6"/>
 	</nyseHeader>
 	<nyseCqsShortQuote>
-  		<field>
-    		<name>symbol</name>
-		    <size>3</size>
-		</field>
-  		<field>
-    		<name>quoteCondition</name>
-    		<size>1</size>
-  		</field>
-  		<field>
-    		<name>reserved1</name>
-    		<size>2</size>
-  		</field>
-  		<field>
-    		<name>bidDenominator</name>
-    		<size>1</size>
-  		</field>
-  		<field>
-    		<name>bidPrice</name>
-    		<size>8</size>
-  		</field>
-  		<field>
-    		<name>bidSize</name>
-    		<size>3</size>
-  		</field>
-  		<field>
-    		<name>reserved2</name>
-    		<size>1</size>
-  		</field>
-  		<field>
-    		<name>offerDenominator</name>
-    		<size>1</size>
-  		</field>
-  		<field>
-    		<name>offerPrice</name>
-    		<size>8</size>
-  		</field>
-  		<field>
-    		<name>offerSize</name>
-    		<size>3</size>
-  		</field>
-  		<field>
-    		<name>reserved3</name>
-    		<size>1</size>
-  		</field>
-  		<field>
-    		<name>nationalBboIndicator</name>
-    		<size>1</size>
-  		</field>
-  		<field>
-    		<name>nasdaqBboIndicator</name>
-    		<size>1</size>
-  		</field>
+		<field symbol="3"/>
+		<field quoteCondition="1"/>
+		<field reserved1="2"/>
+		<field bidDenominator="1"/>
+		<field bidPrice="8"/>
+		<field bidSize="3"/>
+		<field reserved2="1"/>
+		<field offerDenominator="1"/>
+		<field offerPrice="8"/>
+		<field offerSize="3"/>
+		<field reserved3="1"/>
+		<field nationalBboIndicator="1"/>
+		<field nasdaqBboIndicator="1"/>
 	</nyseCqsShortQuote>
 	<nyseCqsLongQuote>
-  		<field>
-    		<name>symbol</name>
-    		<size>11</size>
-  		</field>
-  		<field>
-    		<name>suffix</name>
-    		<size>1</size>
-  		</field>
-  		<field>
-    		<name>testIndicator</name>
-    		<size>1</size>
-  		</field>
-  		<field>
-    		<name>reserved1</name>
-    		<size>3</size>
-  		</field>
-  		<field>
-    		<name>financialStatus</name>
-    		<size>1</size>
-  		</field>
-  		<field>
-    		<name>currency</name>
-    		<size>3</size>
-  		</field>
-  		<field>
-    		<name>instrumentType</name>
-    		<size>1</size>
-  		</field>
-  		<field>
-    		<name>cancelCorrectionIndicator</name>
-    		<size>1</size>
-  		</field>
-  		<field>
-    		<name>settlementCondition</name>
-    		<size>1</size>
-  		</field>
-  		<field>
-    		<name>marketCondition</name>
-    		<size>1</size>
-  		</field>
-  		<field>
-    		<name>quoteCondition</name>
-    		<size>1</size>
-  		</field>
-  		<field>
-    		<name>reserved2</name>
-    		<size>2</size>
-  		</field>
-  		<field>
-    		<name>bidDenominator</name>
-    		<size>1</size>
-  		</field>
-  		<field>
-    		<name>bidPrice</name>
-    		<size>12</size>
-  		</field>
-  		<field>
-    		<name>bidSize</name>
-    		<size>7</size>
-  		</field>
-  		<field>
-    		<name>offerDenominator</name>
-    		<size>1</size>
-  		</field>
-  		<field>
-    		<name>offerPrice</name>
-    		<size>12</size>
-  		</field>
-  		<field>
-    		<name>offerSize</name>
-    		<size>7</size>
-  		</field>
-  		<field>
-    		<name>nasdaqMmid</name>
-    		<size>4</size>
-  		</field>
-  		<field>
-    		<name>nasdaqLocation</name>
-    		<size>2</size>
-  		</field>
-  		<field>
-    		<name>nasdaqDesk</name>
-			<size>1</size>
-		</field>
-		<field>
-    		<name>reserved3</name>
-    		<size>2</size>
-		</field>
-		<field>
-	    	<name>nationalBboIndicator</name>
-	    	<size>1</size>
-		</field>
-		<field>
-	    	<name>nasdaqBboIndicator</name>
-	    	<size>1</size>
-		</field>
+		<field symbol="11"/>
+		<field suffix="1"/>
+		<field testIndicator="1"/>
+		<field reserved1="3"/>
+		<field financialStatus="1"/>
+		<field currency="3"/>
+		<field instrumentType="1"/>
+		<field cancelCorrectionIndicator="1"/>
+		<field settlementCondition="1"/>
+		<field marketCondition="1"/>
+		<field quoteCondition="1"/>
+		<field reserved2="2"/>
+		<field bidDenominator="1"/>
+		<field bidPrice="12"/>
+		<field bidSize="7"/>
+		<field offerDenominator="1"/>
+		<field offerPrice="12"/>
+		<field offerSize="7"/>
+		<field nasdaqMmid="4"/>
+		<field nasdaqLocation="2"/>
+		<field nasdaqDesk="1"/>
+		<field reserved3="2"/>
+		<field nationalBboIndicator="1"/>
+		<field nasdaqBboIndicator="1"/>
 	</nyseCqsLongQuote>
 </nyseCqs>
