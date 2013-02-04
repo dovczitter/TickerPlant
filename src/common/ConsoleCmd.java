@@ -1,7 +1,7 @@
 // = ConsoleCmd.java =
 package common;
 
-import clientParser.Console;
+import client.Console;
 
 public enum ConsoleCmd
 {
@@ -30,11 +30,11 @@ public enum ConsoleCmd
 		StringBuilder sb = new StringBuilder();
 		for (ConsoleCmd cmd : ConsoleCmd.values()) {
 			switch (ConfigType.getServerType()) {
-				case ClientParser:
+				case Client:
 					if (cmd==Help || cmd==Down || cmd==Stats || cmd==ResetStats)
 						break;
 					continue;
-				case ServerData:
+				case Server:
 					if (cmd==Help || cmd==Ticker || cmd==Down || cmd==Stats || cmd==ResetStats)
 						break;
 					continue;
@@ -56,7 +56,7 @@ public enum ConsoleCmd
 	{
 		updateStats();
 		StringBuilder sb = new StringBuilder();
-		boolean isServer = (ConfigType.getServerType() == ConfigType.ServerType.ServerData); 
+		boolean isServer = (ConfigType.getServerType() == ConfigType.ServerType.Server); 
 		
 		for (StatusType stat : StatusType.values()) {	
 			if (stat == StatusType.StartMS || (isServer && stat==StatusType.Seqnum))

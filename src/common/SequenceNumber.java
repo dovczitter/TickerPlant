@@ -8,7 +8,7 @@ public class SequenceNumber {
 	private static long firstSeq = 0;
 	public static void setStats (long seqnum)
 	{
-		if ((firstSeq > 0) && (seqnum > (lastSeq+1))) {
+		if ((firstSeq > 0) && (seqnum > (lastSeq+1)) && (lastSeq  < seqnum)) {
 			skipCount += (seqnum - (lastSeq+1));
 			gapCount++;
 		}

@@ -34,8 +34,8 @@ public enum ConfigType
 	}
 	public enum ServerType {
 		None,
-		ClientParser,
-		ServerData;
+		Client,
+		Server;
 	}
 	public enum ConnectType {
 		None,
