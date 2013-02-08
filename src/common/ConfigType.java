@@ -115,7 +115,10 @@ public enum ConfigType
             for (ConfigType type : ConfigType.values())
             {
             	if (key.equalsIgnoreCase(type.name())) {
-            		type.setValue((String)config.get(key));
+            		String value = (String)config.get(key);
+            		type.setValue(value);
+            		if (type == ConfigType.testSymbol)
+            			ConsoleCmd.Symbol.setValue(value.toUpperCase());
             		break;
             	}
             }

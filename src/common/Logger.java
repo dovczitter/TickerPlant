@@ -1,6 +1,6 @@
 // = Logger.java =
 package common;
-
+ 
 public class Logger
 {
 	private org.apache.log4j.Logger logger = null;

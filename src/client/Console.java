@@ -57,6 +57,11 @@ public class Console extends Thread
 					case Stats:
 						System.out.print (ConsoleCmd.getStats());
 						break;
+					case Symbol:
+						String symbol = ConsoleCmd.Symbol.getValue();
+						if (!symbol.isEmpty())
+							System.out.print ("Symbol set to '"+symbol+"'");
+						break;
 					case ResetStats:
 						ConsoleCmd.resetStats();
 						System.out.print (ConsoleCmd.getStats());

@@ -23,6 +23,9 @@ public class Client implements Runnable
 		logger.logInfo("Client start...");
 		loadConfigFile("Client.cfg");
 		
+		/* Static hibernate initiallization. */
+		new HibernateUtil();
+
 		BlockingQueue<String> queue = new ArrayBlockingQueue<String>(MaxQueueSize);
 		new Console (queue);
 		

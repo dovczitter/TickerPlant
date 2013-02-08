@@ -10,18 +10,28 @@ public enum ConsoleCmd
 	Help		(""),
 	ResetStats	(""),
 	Stats		(""),
+	Symbol		(""),
 	Ticker		("");
 	private String value = "";
 	ConsoleCmd (String value)            { this.value = value; }
 	public  String getValue ()           { return this.value; }
 	public  void setValue (String value) { this.value = value; }
 
-	public static ConsoleCmd getCmd (String name)
+	public static ConsoleCmd getCmd (String input)
 	{
+		input = input.trim();
+		int    beginIndex = input.indexOf(" ");
+		String cmdString  = (beginIndex > 0) ? input.substring(0,beginIndex) : input;
+		String value      = (beginIndex > 0) ? input.substring(beginIndex) : "";
+		value = value.trim().toUpperCase();
 		for (ConsoleCmd cmd : ConsoleCmd.values()) {
 			String cmdName = cmd.name().toLowerCase();
-			if ((cmd != None) && name.length() > 0 && cmdName.startsWith(name.toLowerCase()))
+			if ((cmd != None) && input.length() > 0 && cmdName.startsWith(cmdString.toLowerCase()))
+			{
+				if (!value.isEmpty())
+					cmd.setValue(value);
 				return cmd;
+			}
 		}
 		return None;
 	}
@@ -70,4 +80,17 @@ public enum ConsoleCmd
 	{
 		StatusType.resetAll();
 	}
+	public String setUserValue (String userInput)
+	{
+		String val = "";
+		int beginIndex = userInput.trim().indexOf(" ");
+		if (beginIndex > 0) {
+			String symbol = userInput.trim().substring(beginIndex).trim();
+			setValue(symbol);
+		}
+		return val;
+	}
+
+	
+
 }

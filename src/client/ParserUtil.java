@@ -141,6 +141,20 @@ public class ParserUtil
 			return ("bid="+bid+":offer="+offer);
 		return ("bid=NA:offer=NA");
 	}
+	public static String getMsgBid (HashMap<String,MsgIndex> map, String msg)
+	{
+		String bid = getMsgValue (Fields.bidPrice, map, msg);
+		if (bid!=null && !bid.isEmpty())
+			return bid;
+		return "0";
+	}
+	public static String getMsgOffer (HashMap<String,MsgIndex> map, String msg)
+	{
+		String offer = getMsgValue (Fields.offerPrice, map, msg);
+		if (offer!=null && !offer.isEmpty())
+			return offer;
+		return "0";
+	}
 	public static long getMsgSeqnum (HashMap<String,MsgIndex> map, String msg)
 	{
 		long seqnum = 0;
